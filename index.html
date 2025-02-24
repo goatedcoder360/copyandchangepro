@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy + Change Pro</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: #d3d3d3;
+            color: #333;
+        }
+        #editor {
+            width: 80%;
+            height: 200px;
+            margin: 10px auto;
+            display: block;
+            padding: 10px;
+            border: 2px solid #0056b3;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            color: black;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        #editor:focus {
+            border-color: #004494;
+            outline: none;
+        }
+        .button {
+            margin: 5px;
+            padding: 12px 25px;
+            cursor: pointer;
+            border: none;
+            border-radius: 25px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        .button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        .controls-container {
+            background: darkgray;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type="color"], input[type="number"] {
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Copy + Change Pro</h1>
+    <textarea id="editor" placeholder="Type here..."></textarea><br>
+    <div class="controls-container">
+        <div class="controls">
+            <input type="color" id="colorPicker" value="#000000" onchange="changeColor()">
+            <input type="number" id="fontSize" min="1" max="50" value="12" onchange="changeFontSize()">
+        </div>
+    </div>
+    <div>
+        <button class="button" onclick="applyFont()">Upload Font</button>
+        <button class="button" onclick="copyText()">Copy</button>
+    </div>
+
+    <script>
+        function applyFont() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.ttf, .otf';
+            fileInput.onchange = () => {
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const fontData = e.target.result;
+                        const fontName = file.name.split('.')[0];
+                        const newFont = new FontFace(fontName, `url(${fontData})`);
+                        newFont.load().then((loadedFont) => {
+                            document.fonts.add(loadedFont);
+                            document.getElementById('editor').style.fontFamily = fontName;
+                        }).catch(error => console.error('Font loading error:', error));
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            fileInput.click();
+        }
+
+        function copyText() {
+            const editor = document.getElementById('editor');
+            editor.select();
+            document.execCommand('copy');
+            alert('Text copied to clipboard!');
+        }
+
+        function changeColor() {
+            const editor = document.getElementById('editor');
+            const color = document.getElementById('colorPicker').value;
+            editor.style.color = color;
+        }
+
+        function changeFontSize() {
+            const editor = document.getElementById('editor');
+            const size = document.getElementById('fontSize').value + 'px';
+            editor.style.fontSize = size;
+        }
+    </script>
+</body>
+</html>
